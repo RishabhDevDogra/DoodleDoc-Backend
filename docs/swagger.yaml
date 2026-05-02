@@ -1,0 +1,45 @@
+basePath: /
+definitions:
+  handler.CitiesResponse:
+    properties:
+      cities:
+        items:
+          type: string
+        type: array
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: API documentation for the DoodleDoc backend service.
+  title: DoodleDoc Backend API
+  version: "1.0"
+paths:
+  /cities:
+    get:
+      description: Returns the list of city names.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.CitiesResponse'
+      summary: List cities
+      tags:
+      - cities
+  /health:
+    get:
+      description: Returns liveness status for the service.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Health check
+      tags:
+      - health
+swagger: "2.0"

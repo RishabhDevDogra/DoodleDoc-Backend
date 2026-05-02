@@ -1,0 +1,69 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "API documentation for the DoodleDoc backend service.",
+        "title": "DoodleDoc Backend API",
+        "contact": {},
+        "version": "1.0"
+    },
+    "host": "localhost:8080",
+    "basePath": "/",
+    "paths": {
+        "/cities": {
+            "get": {
+                "description": "Returns the list of city names.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "cities"
+                ],
+                "summary": "List cities",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/handler.CitiesResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/health": {
+            "get": {
+                "description": "Returns liveness status for the service.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "health"
+                ],
+                "summary": "Health check",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "handler.CitiesResponse": {
+            "type": "object",
+            "properties": {
+                "cities": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        }
+    }
+}
