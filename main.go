@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"net/http"
+	"os"
 
 	_ "github.com/doodledoc/backend/docs"
 	"github.com/doodledoc/backend/internal/router"
@@ -17,8 +18,14 @@ import (
 func main() {
 	r := router.New()
 
-	log.Println("Server starting on :8080")
-	if err := http.ListenAndServe(":8080", r); err != nil {
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
+	addr := ":" + port
+
+	log.Printf("Server starting on %s", addr)
+	if err := http.ListenAndServe(addr, r); err != nil {
 		log.Fatalf("server error: %v", err)
 	}
 }
