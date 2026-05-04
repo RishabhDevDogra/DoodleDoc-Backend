@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
-import * as signalR from '@microsoft/signalr';
-import { API_URL, HUB_URL, SIGNALR_RECONNECT_DELAYS, SIGNALR_STARTUP_DELAY_MS } from '../config';
+import { API_URL, WS_HUB_URL } from '../config';
 import DocumentEditor from '../components/DocumentEditor';
 import TopNavbar from '../components/TopNavbar';
 import Comments from '../components/Comments';
@@ -26,26 +25,25 @@ function ShareView() {
   }, []);
 
   useEffect(() => {
-    const connection = new signalR.HubConnectionBuilder()
-      .withUrl(HUB_URL)
-      .withAutomaticReconnect(SIGNALR_RECONNECT_DELAYS)
-      .build();
+    const ws = new WebSocket(WS_HUB_URL);
 
-    const connectionTimer = setTimeout(() => {
-      connection.start()
-        .then(() => console.log('ShareView SignalR Connected'))
-        .catch(err => console.error('SignalR error:', err));
-    }, SIGNALR_STARTUP_DELAY_MS);
+    ws.onopen = () => console.log('ShareView WebSocket Connected');
 
-    connection.on('DocumentUpdated', (updatedDocId) => {
-      if (updatedDocId === documentId && !isEditingRef.current) {
-        fetchDocument(documentId);
+    ws.onmessage = (event) => {
+      try {
+        const { type, payload } = JSON.parse(event.data);
+        if (type === 'DocumentUpdated' && payload.documentId === documentId && !isEditingRef.current) {
+          fetchDocument(documentId);
+        }
+      } catch (err) {
+        console.error('WebSocket message parse error:', err);
       }
-    });
+    };
+
+    ws.onerror = (err) => console.error('WebSocket error:', err);
 
     return () => {
-      clearTimeout(connectionTimer);
-      connection.stop();
+      ws.close();
     };
   }, [documentId]);
 

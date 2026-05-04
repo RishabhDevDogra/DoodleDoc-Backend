@@ -11,6 +11,21 @@ import (
 	httpSwagger "github.com/swaggo/http-swagger"
 )
 
+// corsMiddleware adds CORS headers so the React dev server (port 3000) can
+// reach the Go backend (port 8080).
+func corsMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Access-Control-Allow-Origin", "http://localhost:3000")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+		if r.Method == http.MethodOptions {
+			w.WriteHeader(http.StatusNoContent)
+			return
+		}
+		next.ServeHTTP(w, r)
+	})
+}
+
 // New returns a configured HTTP mux.
 func New() http.Handler {
 	mux := http.NewServeMux()
@@ -49,5 +64,5 @@ func New() http.Handler {
 	mux.HandleFunc("GET /hubs/document", wsHub.ServeWS)
 	mux.Handle("GET /swagger/", httpSwagger.WrapHandler)
 
-	return mux
+	return corsMiddleware(mux)
 }
