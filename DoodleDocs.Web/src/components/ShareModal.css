@@ -1,0 +1,260 @@
+.share-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.share-modal {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  max-width: 500px;
+  width: 90%;
+  overflow: hidden;
+}
+
+.share-modal-header {
+  padding: 20px 24px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(249, 249, 249, 0.95);
+}
+
+.share-modal-header h2 {
+  margin: 0;
+  color: var(--apple-text);
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.share-modal-close {
+  background: transparent;
+  border: none;
+  color: var(--apple-text-secondary);
+  font-size: 24px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+
+.share-modal-close:hover {
+  background: rgba(0, 0, 0, 0.05);
+  color: var(--apple-text);
+}
+
+.share-modal-content {
+  padding: 24px;
+}
+
+.share-description {
+  margin: 0 0 16px 0;
+  color: var(--apple-text-secondary);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.share-link-container {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+
+.share-link-input {
+  flex: 1;
+  padding: 10px 14px;
+  background: rgba(0, 0, 0, 0.04);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  color: var(--apple-text);
+  font-size: 13px;
+  font-weight: 500;
+  outline: none;
+  transition: all 0.2s ease;
+  word-break: break-all;
+}
+
+.share-link-input:focus {
+  background: rgba(0, 122, 255, 0.05);
+  border-color: var(--apple-blue);
+  box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
+}
+
+.share-copy-btn {
+  padding: 10px 16px;
+  background: var(--apple-blue);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 13px;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  box-shadow: 0 2px 8px rgba(0, 122, 255, 0.2);
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
+}
+
+.share-copy-btn:hover {
+  background: #0051d5;
+  box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3);
+  transform: scale(1.02);
+}
+
+.share-copy-btn.copied {
+  background: #34c759;
+  box-shadow: 0 2px 8px rgba(52, 199, 89, 0.3);
+}
+
+.share-copy-btn.error {
+  background: #ff3b30;
+  box-shadow: 0 2px 8px rgba(255, 59, 48, 0.3);
+}
+
+.share-methods {
+  margin-bottom: 20px;
+  padding: 16px;
+  background: rgba(0, 0, 0, 0.02);
+  border-radius: 12px;
+}
+
+.share-methods h3 {
+  margin: 0 0 12px 0;
+  color: var(--apple-text);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.share-buttons {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.share-social-btn {
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  background: rgba(0, 0, 0, 0.05);
+  color: var(--apple-text);
+  font-size: 18px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.share-social-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.share-social-btn.twitter {
+  background: rgba(29, 161, 242, 0.1);
+  border-color: rgba(29, 161, 242, 0.3);
+  color: #1DA1F2;
+}
+
+.share-social-btn.twitter:hover {
+  background: #1DA1F2;
+  border-color: #1DA1F2;
+  color: white;
+}
+
+.share-social-btn.facebook {
+  background: rgba(24, 119, 242, 0.1);
+  border-color: rgba(24, 119, 242, 0.3);
+  color: #1877F2;
+}
+
+.share-social-btn.facebook:hover {
+  background: #1877F2;
+  border-color: #1877F2;
+  color: white;
+}
+
+.share-social-btn.email {
+  background: rgba(234, 67, 53, 0.1);
+  border-color: rgba(234, 67, 53, 0.3);
+  color: #EA4335;
+}
+
+.share-social-btn.email:hover {
+  background: #EA4335;
+  border-color: #EA4335;
+  color: white;
+}
+
+.share-info {
+  background: rgba(0, 122, 255, 0.08);
+  border-left: 3px solid var(--apple-blue);
+  padding: 12px 16px;
+  border-radius: 6px;
+}
+
+.share-info p {
+  margin: 0;
+  color: var(--apple-text);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+/* Mobile Responsive */
+@media (max-width: 480px) {
+  .share-modal {
+    width: 95%;
+  }
+
+  .share-modal-header {
+    padding: 16px;
+  }
+
+  .share-modal-header h2 {
+    font-size: 16px;
+  }
+
+  .share-modal-content {
+    padding: 16px;
+  }
+
+  .share-link-container {
+    flex-direction: column;
+  }
+
+  .share-copy-btn {
+    width: 100%;
+  }
+
+  .share-methods {
+    padding: 12px;
+  }
+
+  .share-buttons {
+    gap: 6px;
+  }
+
+  .share-social-btn {
+    width: 40px;
+    height: 40px;
+    font-size: 16px;
+  }
+}
