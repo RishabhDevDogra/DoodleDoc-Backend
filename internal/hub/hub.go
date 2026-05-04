@@ -10,7 +10,7 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-// message type names — equivalent to C# HubMethods constants.
+// message type names sent over the WebSocket.
 const (
 	MsgDocumentCreated = "DocumentCreated"
 	MsgDocumentUpdated = "DocumentUpdated"
@@ -33,7 +33,7 @@ type client struct {
 }
 
 // Hub manages all active WebSocket connections and broadcasts to them.
-// It is the Go equivalent of SignalR's IHubContext<DocumentHub>.
+// It broadcasts events to all connected clients.
 type Hub struct {
 	mu      sync.RWMutex
 	clients map[*client]struct{}

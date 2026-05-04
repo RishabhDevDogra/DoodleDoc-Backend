@@ -7,7 +7,6 @@ import (
 )
 
 // DomainEvent is the interface all domain events must satisfy.
-// It mirrors the C# abstract DomainEvent base class.
 type DomainEvent interface {
 	GetEventID() string
 	GetDocumentID() string

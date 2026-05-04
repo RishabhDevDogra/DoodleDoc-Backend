@@ -7,7 +7,6 @@ import (
 	"github.com/doodledoc/backend/internal/hub"
 	"github.com/doodledoc/backend/internal/infrastructure"
 	"github.com/doodledoc/backend/internal/readmodel"
-	"github.com/doodledoc/backend/internal/repository"
 	"github.com/doodledoc/backend/internal/service"
 	httpSwagger "github.com/swaggo/http-swagger"
 )
@@ -15,12 +14,6 @@ import (
 // New returns a configured HTTP mux.
 func New() http.Handler {
 	mux := http.NewServeMux()
-
-	// ── legacy city endpoints (kept for reference) ────────────────────────────
-	cityRepo := repository.NewInMemoryCityRepository()
-	cityService := service.NewCityService(cityRepo)
-	cityHandler := handler.NewCityHandler(cityService)
-	mux.HandleFunc("GET /cities", cityHandler.ListCities)
 
 	// ── DoodleDoc CQRS wiring ─────────────────────────────────────────────────
 	eventStore := infrastructure.NewInMemoryEventStore()

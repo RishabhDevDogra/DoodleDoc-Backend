@@ -3,8 +3,7 @@ package domain
 import "time"
 
 // DocumentAggregate is the aggregate root for a document.
-// State is reconstructed entirely by replaying domain events —
-// no external database is needed (mirrors the C# in-memory design).
+// State is reconstructed entirely by replaying domain events.
 type DocumentAggregate struct {
 	ID        string
 	Title     string

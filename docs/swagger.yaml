@@ -1,11 +1,80 @@
 basePath: /
 definitions:
-  handler.CitiesResponse:
+  handler.addCommentRequest:
     properties:
-      cities:
+      author:
+        type: string
+      text:
+        type: string
+    type: object
+  handler.createDocumentRequest:
+    properties:
+      title:
+        type: string
+      userId:
+        type: string
+      userName:
+        type: string
+    type: object
+  handler.updateDocumentRequest:
+    properties:
+      content:
+        type: string
+      title:
+        type: string
+      userId:
+        type: string
+      userName:
+        type: string
+    type: object
+  readmodel.Comment:
+    properties:
+      author:
+        type: string
+      id:
+        type: string
+      text:
+        type: string
+      timestamp:
+        type: string
+    type: object
+  readmodel.DocumentProjection:
+    properties:
+      comments:
         items:
-          type: string
+          $ref: '#/definitions/readmodel.Comment'
         type: array
+      content:
+        type: string
+      createdAt:
+        type: string
+      id:
+        type: string
+      title:
+        type: string
+      updatedAt:
+        type: string
+      version:
+        type: integer
+    type: object
+  service.HistoryEntry:
+    properties:
+      description:
+        type: string
+      documentId:
+        type: string
+      eventId:
+        type: string
+      eventType:
+        type: string
+      occurredAt:
+        type: string
+      userId:
+        type: string
+      userName:
+        type: string
+      version:
+        type: integer
     type: object
 host: localhost:8080
 info:
@@ -14,19 +83,293 @@ info:
   title: DoodleDoc Backend API
   version: "1.0"
 paths:
-  /cities:
+  /api/document:
     get:
-      description: Returns the list of city names.
+      description: Returns all document projections, newest first.
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/handler.CitiesResponse'
-      summary: List cities
+            items:
+              $ref: '#/definitions/readmodel.DocumentProjection'
+            type: array
+      summary: List all documents
       tags:
-      - cities
+      - documents
+    post:
+      consumes:
+      - application/json
+      description: Creates a new document and returns its projection.
+      parameters:
+      - description: Create request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/handler.createDocumentRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/readmodel.DocumentProjection'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Create a document
+      tags:
+      - documents
+  /api/document/{id}:
+    delete:
+      description: Deletes a document by ID.
+      parameters:
+      - description: Document ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: User ID
+        in: query
+        name: userId
+        type: string
+      - description: User name
+        in: query
+        name: userName
+        type: string
+      responses:
+        "200":
+          description: OK
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Delete a document
+      tags:
+      - documents
+    get:
+      description: Returns the current projection for a document.
+      parameters:
+      - description: Document ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/readmodel.DocumentProjection'
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get a document
+      tags:
+      - documents
+    put:
+      consumes:
+      - application/json
+      description: Updates title and/or content of an existing document.
+      parameters:
+      - description: Document ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Update request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/handler.updateDocumentRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/readmodel.DocumentProjection'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Update a document
+      tags:
+      - documents
+  /api/document/{id}/comments:
+    get:
+      description: Returns all active comments on a document.
+      parameters:
+      - description: Document ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/readmodel.Comment'
+            type: array
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: List comments
+      tags:
+      - comments
+    post:
+      consumes:
+      - application/json
+      description: Adds a comment to a document.
+      parameters:
+      - description: Document ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Comment body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/handler.addCommentRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/readmodel.DocumentProjection'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Add a comment
+      tags:
+      - comments
+  /api/document/{id}/comments/{commentId}:
+    delete:
+      description: Removes a comment from a document.
+      parameters:
+      - description: Document ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Comment ID
+        in: path
+        name: commentId
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Delete a comment
+      tags:
+      - comments
+  /api/document/{id}/history:
+    get:
+      description: Returns the full ordered event log for a document.
+      parameters:
+      - description: Document ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/service.HistoryEntry'
+            type: array
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get event history
+      tags:
+      - documents
+  /api/document/{id}/version/{version}:
+    get:
+      description: Replays events up to version N — enables time travel / undo.
+      parameters:
+      - description: Document ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Version number
+        in: path
+        name: version
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/readmodel.DocumentProjection'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get document at version
+      tags:
+      - documents
   /health:
     get:
       description: Returns liveness status for the service.
