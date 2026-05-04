@@ -1,0 +1,18 @@
+services:
+  backend:
+    build: .
+    container_name: doodledoc-backend
+    ports:
+      - "8080:8080"
+
+  frontend:
+    build:
+      context: ./DoodleDocs.Web
+      args:
+        # In production the frontend proxies through nginx, so API_URL is empty (relative)
+        REACT_APP_API_URL: ""
+    container_name: doodledoc-frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
