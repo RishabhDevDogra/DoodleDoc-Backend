@@ -250,6 +250,99 @@ Go 1.22+ supports method+path routing natively (`GET /api/document/{id}`). Zero 
 
 ---
 
+## 🔀 Concurrency Model (Goroutines in Action)
+
+This is where Go shines. Every browser tab that connects to `/hubs/document` gets its own pair of goroutines — a writer and a reader — coordinated through channels and a mutex.
+
+### The pattern
+
+```
+REST handler goroutine
+    │
+    └── hub.Broadcast(msg)
+            │  (sync.RWMutex — safe for concurrent callers)
+            ├── client A → chan []byte ──► writer goroutine A ──► WebSocket ──► Tab A
+            ├── client B → chan []byte ──► writer goroutine B ──► WebSocket ──► Tab B
+            └── client C → chan []byte ──► writer goroutine C ──► WebSocket ──► Tab C
+```
+
+### Why two goroutines per connection?
+
+WebSocket connections in Go block on read and write. You can't do both in one goroutine without either missing messages or hanging. The split is:
+
+- **Writer goroutine** — owns all writes to the WebSocket. Blocks on the client's send channel, writes whatever arrives.
+- **Reader goroutine** — owns all reads. Even though this server only pushes (never receives canvas data over WS), you *must* read continuously or the browser's ping frames go unacknowledged and the connection drops.
+
+```go
+// Writer goroutine — one per connected tab
+go func() {
+    defer func() {
+        h.unregister(c)
+        conn.Close()
+    }()
+    for msg := range c.send {   // blocks until a message arrives
+        conn.WriteMessage(websocket.TextMessage, msg)
+    }
+}()
+
+// Reader goroutine — keeps the connection alive
+go func() {
+    defer func() {
+        h.unregister(c)
+        conn.Close()
+    }()
+    conn.SetPongHandler(func(string) error {
+        conn.SetReadDeadline(time.Now().Add(60 * time.Second))
+        return nil
+    })
+    for {
+        if _, _, err := conn.ReadMessage(); err != nil {
+            break   // client disconnected — triggers unregister via defer
+        }
+    }
+}()
+```
+
+### Why a buffered channel?
+
+```go
+c := &client{send: make(chan []byte, 256)}
+```
+
+The `Broadcast` method loops over all clients and sends to each channel. If a client's channel were unbuffered, a slow or stalled browser tab would block the broadcast for *everyone*. The buffer of 256 means the broadcaster can move on immediately — if a client falls too far behind, its channel fills and it gets dropped.
+
+### Why `sync.RWMutex` and not a channel for the client map?
+
+Multiple goroutines read the client map simultaneously (every broadcast). Using `RWMutex` lets all of them read in parallel and only locks exclusively when a client connects or disconnects. A channel-based approach would serialize all reads unnecessarily.
+
+```go
+// Broadcast — called from service layer after every command
+func (h *Hub) Broadcast(msg Message) {
+    data, _ := json.Marshal(msg)
+    h.mu.RLock()                          // read lock — allows concurrent broadcasts
+    defer h.mu.RUnlock()
+    for c := range h.clients {
+        select {
+        case c.send <- data:              // non-blocking send
+        default:
+            h.unregister(c)               // buffer full — drop the slow client
+        }
+    }
+}
+```
+
+### Key Go concurrency concepts used here
+
+| Concept | Where | Why |
+|---|---|---|
+| `goroutine` | writer + reader per connection | Lightweight — thousands can run concurrently |
+| `chan []byte` | per-client send queue | Decouples broadcaster from slow writers |
+| `sync.RWMutex` | client map | Multiple concurrent readers, exclusive writers |
+| `select` with `default` | Broadcast loop | Non-blocking channel send — never hangs |
+| `defer` + cleanup | both goroutines | Guarantees unregister even on panic or error |
+
+
+
 ## 📊 API Reference
 
 ### Documents
