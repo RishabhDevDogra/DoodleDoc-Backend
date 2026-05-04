@@ -9,8 +9,7 @@ services:
     build:
       context: ./DoodleDocs.Web
       args:
-        # In production the frontend proxies through nginx, so API_URL is empty (relative)
-        REACT_APP_API_URL: ""
+        REACT_APP_API_URL: "http://localhost:8080"
     container_name: doodledoc-frontend
     ports:
       - "3000:80"
