@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import { API_URL, WS_HUB_URL } from './config';
 import './App.css';
 import DocumentList from './components/DocumentList';
@@ -13,8 +14,10 @@ import { getOrCreateUserId } from './utils/userSession';
 
 function App() {
   const { addToast } = useToast();
+  const { docId: urlDocId } = useParams();
+  const navigate = useNavigate();
   const [documents, setDocuments] = useState([]);
-  const [selectedDocId, setSelectedDocId] = useState(null);
+  const [selectedDocId, setSelectedDocId] = useState(urlDocId || null);
   const [selectedDoc, setSelectedDoc] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [userName, setUserName] = useState('');
@@ -80,6 +83,13 @@ function App() {
   useEffect(() => {
     fetchDocuments();
   }, []);
+
+  // Keep URL in sync with selected document
+  useEffect(() => {
+    if (selectedDocId) {
+      navigate(`/${selectedDocId}`, { replace: true });
+    }
+  }, [selectedDocId]);
 
   // Auto-create first document if none exist and select it
   useEffect(() => {

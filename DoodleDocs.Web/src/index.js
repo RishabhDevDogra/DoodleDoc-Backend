@@ -13,7 +13,7 @@ root.render(
     <ToastProvider>
       <Router>
         <Routes>
-          <Route path="/" element={<App />} />
+          <Route path="/:docId?" element={<App />} />
           <Route path="/share/:documentId" element={<ShareView />} />
         </Routes>
       </Router>
