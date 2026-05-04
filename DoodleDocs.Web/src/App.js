@@ -32,13 +32,15 @@ function App() {
 
   // Set up WebSocket connection for real-time updates
   useEffect(() => {
+    let active = true;
     const ws = new WebSocket(WS_HUB_URL);
 
     ws.onopen = () => {
-      console.log('WebSocket Connected');
+      if (active) console.log('WebSocket Connected');
     };
 
     ws.onmessage = (event) => {
+      if (!active) return;
       try {
         const { type, payload } = JSON.parse(event.data);
 
@@ -64,11 +66,12 @@ function App() {
       }
     };
 
-    ws.onerror = (err) => {
-      console.error('WebSocket error:', err);
+    ws.onerror = () => {
+      if (active) console.error('WebSocket error');
     };
 
     return () => {
+      active = false;
       ws.close();
     };
   }, [selectedDocId]);

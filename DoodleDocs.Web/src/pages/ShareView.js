@@ -25,11 +25,13 @@ function ShareView() {
   }, []);
 
   useEffect(() => {
+    let active = true;
     const ws = new WebSocket(WS_HUB_URL);
 
-    ws.onopen = () => console.log('ShareView WebSocket Connected');
+    ws.onopen = () => { if (active) console.log('ShareView WebSocket Connected'); };
 
     ws.onmessage = (event) => {
+      if (!active) return;
       try {
         const { type, payload } = JSON.parse(event.data);
         if (type === 'DocumentUpdated' && payload.documentId === documentId && !isEditingRef.current) {
@@ -40,9 +42,10 @@ function ShareView() {
       }
     };
 
-    ws.onerror = (err) => console.error('WebSocket error:', err);
+    ws.onerror = () => { if (active) console.error('WebSocket error'); };
 
     return () => {
+      active = false;
       ws.close();
     };
   }, [documentId]);
